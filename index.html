@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#090d18"><title>SAYMON LIFE AI</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#090d18;color:#eef2ff;font:15px Arial,sans-serif;padding:20px 16px 90px}
+header{display:flex;justify-content:space-between;align-items:center;margin:8px 0 22px}
+.logo{font-weight:800;letter-spacing:1.5px;font-size:19px}.muted{color:#8994ad;font-size:12px}
+h1{font-size:25px;margin:8px 0}h2{font-size:17px;margin:0 0 12px}
+.card{background:#121a2b;border:1px solid #202b43;border-radius:18px;padding:16px;margin:12px 0}
+.water{font-size:34px;font-weight:800;margin:7px 0}.accent{color:#73d7ff}
+button{background:#243652;color:#f5f8ff;border:0;border-radius:12px;padding:12px 14px;font-weight:700;margin:4px 3px 4px 0}
+button.primary{background:#4c82c8}.tabs{position:fixed;bottom:0;left:0;right:0;background:#101827;border-top:1px solid #27334b;display:flex;overflow:auto;padding:8px 5px;gap:4px}
+.tabs button{font-size:11px;padding:10px 9px;white-space:nowrap;margin:0}
+input,textarea{width:100%;background:#0b1220;color:white;border:1px solid #2a3854;border-radius:10px;padding:12px;margin:6px 0 10px}
+.entry{padding:10px 0;border-bottom:1px solid #263149}.hidden{display:none}
+.stat{display:inline-block;background:#1a2940;padding:10px;border-radius:12px;margin:4px}
+</style></head><body>
+<header><div><div class="logo">SAYMON <span class="accent">LIFE AI</span></div><div class="muted">ТВОЙ ЛИЧНЫЙ ТРЕКЕР</div></div><div>✦</div></header>
+<section id="home">
+ <div class="muted" id="today"></div><h1>Твой день под контролем.</h1>
+ <div class="card"><h2>💧 Вода сегодня</h2><div class="water"><span id="water">0</span><span class="muted"> / <span id="goalLabel">3000</span> мл</span></div>
+ <div class="muted">Твоя дневная цель</div><button class="primary" onclick="addWater(200)">+200 мл</button><button onclick="addWater(300)">+300 мл</button>
+ <button onclick="setGoal()">Изменить цель</button></div>
+ <div class="card"><h2>Быстрая запись</h2><button onclick="show('food')">🍽 Питание</button><button onclick="show('sport')">💪 Тренировка</button><button onclick="show('sleep')">🌙 Сон</button></div>
+ <div class="card"><h2>Сегодня</h2><div id="summary" class="muted">Пока нет других записей.</div></div>
+</section>
+<section id="food" class="hidden"><h1>🍽 Питание</h1><div class="card"><label>Что ел?</label><input id="foodText" placeholder="Например: обед"><label>Заметка (необязательно)</label><textarea id="foodNote" placeholder="Количество, комментарий..."></textarea><button class="primary" onclick="save('Питание','foodText','foodNote')">Сохранить</button></div><div id="foodList" class="card"></div></section>
+<section id="sport" class="hidden"><h1>💪 Спорт</h1><div class="card"><label>Упражнение</label><input id="sportText" placeholder="Например: отжимания"><label>Повторы / время / заметка</label><input id="sportNote" placeholder="Например: 15 повторений"><button class="primary" onclick="save('Тренировка','sportText','sportNote')">Сохранить</button></div><div id="sportList" class="card"></div></section>
+<section id="sleep" class="hidden"><h1>🌙 Сон</h1><div class="card"><label>Сколько спал (часы)</label><input id="sleepText" type="number" step=".5" placeholder="Например: 8"><label>Как себя чувствуешь?</label><input id="sleepNote" placeholder="Например: нормально"><button class="primary" onclick="save('Сон','sleepText','sleepNote')">Сохранить</button></div><div id="sleepList" class="card"></div></section>
+<section id="health" class="hidden"><h1>❤️ Здоровье</h1><div class="card"><input id="healthText" placeholder="Самочувствие / заметка"><input id="healthNote" placeholder="Дополнительная информация"><button class="primary" onclick="save('Здоровье','healthText','healthNote')">Сохранить</button></div><div id="healthList" class="card"></div></section>
+<section id="hobbies" class="hidden"><h1>🎯 Хобби и цели</h1><div class="card"><input id="hobbiesText" placeholder="Чем занимался?"><input id="hobbiesNote" placeholder="Результат / заметка"><button class="primary" onclick="save('Хобби','hobbiesText','hobbiesNote')">Сохранить</button></div><div id="hobbiesList" class="card"></div></section>
+<section id="stats" class="hidden"><h1>📊 Статистика</h1><div class="card" id="statsContent"></div></section>
+<section id="ai" class="hidden"><h1>✦ AI-помощник</h1><div class="card"><p>Раздел подготовлен. Для настоящего AI-чата потребуется подключение к интернету и API-ключ. Не вводи сюда пароли или личные секреты.</p></div></section>
+<section id="settings" class="hidden"><h1>⚙️ Настройки</h1><div class="card"><p>Цель воды: <b id="settingsGoal"></b> мл</p><button onclick="setGoal()">Изменить цель воды</button><p class="muted">Записи хранятся локально на этом устройстве в приложении.</p></div></section>
+<nav class="tabs">
+<button onclick="show('home')">⌂ Главная</button><button onclick="show('food')">🍽 Еда</button><button onclick="show('sport')">💪 Спорт</button><button onclick="show('sleep')">🌙 Сон</button><button onclick="show('health')">❤️ Здоровье</button><button onclick="show('hobbies')">🎯 Хобби</button><button onclick="show('stats')">📊 Статы</button><button onclick="show('ai')">✦ AI</button><button onclick="show('settings')">⚙️</button>
+</nav>
+<script>
+const day=()=>new Date().toISOString().slice(0,10);
+let data=JSON.parse(localStorage.getItem('saymon_data')||'{}');
+function persist(){localStorage.setItem('saymon_data',JSON.stringify(data));render()}
+function today(){if(!data[day()])data[day()]={water:0,items:[]};return data[day()]}
+function addWater(n){today().water+=n;persist()}
+function setGoal(){let v=prompt('Дневная цель воды в мл',data.goal||3000);if(v&&Number(v)>0){data.goal=Number(v);persist()}}
+function save(type,a,b){let x=document.getElementById(a),y=document.getElementById(b);if(!x.value.trim())return alert('Заполни основное поле');today().items.push({type,a:x.value,b:y.value,time:new Date().toLocaleTimeString()});x.value='';y.value='';persist()}
+function show(id){document.querySelectorAll('body>section').forEach(s=>s.classList.add('hidden'));document.getElementById(id).classList.remove('hidden');render()}
+function list(id,type){let items=today().items.filter(x=>x.type===type).slice().reverse();document.getElementById(id).innerHTML=items.length?items.map(x=>`<div class="entry"><b>${esc(x.a)}</b><div class="muted">${esc(x.b||'') } · ${x.time}</div></div>`).join(''):'<span class="muted">Записей пока нет.</span>'}
+function esc(s){return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
+function render(){let t=today(),g=data.goal||3000;document.getElementById('water').textContent=t.water;document.getElementById('goalLabel').textContent=g;document.getElementById('settingsGoal').textContent=g;document.getElementById('today').textContent=new Date().toLocaleDateString('ru-RU',{weekday:'long',day:'numeric',month:'long'});['food','sport','sleep','health','hobbies'].forEach(k=>list(k+'List',({food:'Питание',sport:'Тренировка',sleep:'Сон',health:'Здоровье',hobbies:'Хобби'})[k]));document.getElementById('summary').textContent=`Вода: ${t.water} мл · Записей: ${t.items.length}`;let all=Object.values(data).filter(v=>v&&Array.isArray(v.items));document.getElementById('statsContent').innerHTML=`<div class="stat">Дней с данными: ${all.length}</div><div class="stat">Всего записей: ${all.reduce((n,v)=>n+v.items.length,0)}</div><div class="stat">Вода сегодня: ${t.water} мл</div>`}
+render();
+</script></body></html>
