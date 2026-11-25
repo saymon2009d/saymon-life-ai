@@ -1,0 +1,12 @@
+
+{
+  "name": "SAYMON LIFE AI",
+  "short_name": "SAYMON",
+  "description": "Твой личный помощник",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#090d18",
+  "theme_color": "#090d18",
+  "orientation": "portrait"
+}
