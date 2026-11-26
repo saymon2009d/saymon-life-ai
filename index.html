@@ -1,57 +1,219 @@
 <!doctype html>
-<html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="them<e-color" content="#090d18"><link rel="manifest" href="./manifest.json"<title>SAYMON LIFE AI</title>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#090909">
+<link rel="manifest" href="./manifest.json">
+<title>SAYMON LIFE AI</title>
 <style>
-*{box-sizing:border-box}body{margin:0;background:#090d18;color:#eef2ff;font:15px Arial,sans-serif;padding:20px 16px 90px}
-header{display:flex;justify-content:space-between;align-items:center;margin:8px 0 22px}
-.logo{font-weight:800;letter-spacing:1.5px;font-size:19px}.muted{color:#8994ad;font-size:12px}
-h1{font-size:25px;margin:8px 0}h2{font-size:17px;margin:0 0 12px}
-.card{background:#121a2b;border:1px solid #202b43;border-radius:18px;padding:16px;margin:12px 0}
-.water{font-size:34px;font-weight:800;margin:7px 0}.accent{color:#73d7ff}
-button{background:#243652;color:#f5f8ff;border:0;border-radius:12px;padding:12px 14px;font-weight:700;margin:4px 3px 4px 0}
-button.primary{background:#4c82c8}.tabs{position:fixed;bottom:0;left:0;right:0;background:#101827;border-top:1px solid #27334b;display:flex;overflow:auto;padding:8px 5px;gap:4px}
-.tabs button{font-size:11px;padding:10px 9px;white-space:nowrap;margin:0}
-input,textarea{width:100%;background:#0b1220;color:white;border:1px solid #2a3854;border-radius:10px;padding:12px;margin:6px 0 10px}
-.entry{padding:10px 0;border-bottom:1px solid #263149}.hidden{display:none}
-.stat{display:inline-block;background:#1a2940;padding:10px;border-radius:12px;margin:4px}
-</style></head><body>
-<header><div><div class="logo">SAYMON <span class="accent">LIFE AI</span></div><div class="muted">ТВОЙ ЛИЧНЫЙ ТРЕКЕР</div></div><div>✦</div></header>
-<section id="home">
- <div class="muted" id="today"></div><h1>Твой день под контролем.</h1>
- <div class="card"><h2>💧 Вода сегодня</h2><div class="water"><span id="water">0</span><span class="muted"> / <span id="goalLabel">3000</span> мл</span></div>
- <div class="muted">Твоя дневная цель</div><button class="primary" onclick="addWater(200)">+200 мл</button><button onclick="addWater(300)">+300 мл</button>
- <button onclick="setGoal()">Изменить цель</button></div>
- <div class="card"><h2>Быстрая запись</h2><button onclick="show('food')">🍽 Питание</button><button onclick="show('sport')">💪 Тренировка</button><button onclick="show('sleep')">🌙 Сон</button></div>
- <div class="card"><h2>Сегодня</h2><div id="summary" class="muted">Пока нет других записей.</div></div>
+:root{--bg:#090909;--panel:#151515;--panel2:#1d1d1d;--line:#2b2b2b;--text:#f5f5f5;--muted:#929292;--orange:#ff841f;--orange2:#ffad57}
+*{box-sizing:border-box}
+body{margin:0;background:radial-gradient(ellipse at 50% 18%,#241306 0%,#101010 38%,var(--bg) 72%);color:var(--text);font:15px Inter,system-ui,Arial,sans-serif;min-height:100vh;padding:18px 16px calc(100px + env(safe-area-inset-bottom))}
+button,input,textarea,select{font:inherit}
+button{border:0;cursor:pointer}
+.topbar{display:flex;align-items:center;justify-content:space-between;max-width:720px;margin:0 auto 22px}
+.brand{font-size:14px;font-weight:900;letter-spacing:2px}.brand span{color:var(--orange)}
+.gear{width:40px;height:40px;border:1px solid #333;border-radius:14px;background:#171717;color:var(--orange);font-size:20px}
+main{max-width:720px;margin:0 auto}
+section{display:none;animation:fade .22s ease}section.active{display:block}
+@keyframes fade{from{opacity:.4;transform:translateY(5px)}to{opacity:1;transform:none}}
+.welcome{min-height:55vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:28px 10px}
+.welcome .eyebrow{font-size:11px;letter-spacing:5px;color:var(--orange);font-weight:800;margin-bottom:18px}
+.welcome h1{font-size:clamp(34px,9vw,58px);line-height:1.05;letter-spacing:-1.8px;margin:0;font-weight:900}
+.welcome h1 span{display:block;color:var(--orange);font-family:Georgia,serif;font-style:italic;font-weight:600;letter-spacing:0}
+.welcome p{color:#9b9b9b;letter-spacing:2.5px;font-size:10px;margin-top:22px}
+.welcome .home-summary{margin-top:40px;color:#b4b4b4;font-size:13px}
+.section-title{font-size:25px;font-weight:850;margin:8px 0 18px}
+.card{background:linear-gradient(145deg,#191919,#111);border:1px solid var(--line);border-radius:20px;padding:17px;margin:12px 0;box-shadow:0 12px 32px #0005}
+.card h2{font-size:16px;margin:0 0 13px}
+.muted{color:var(--muted);font-size:12px}
+.big-number{font-size:36px;font-weight:900;color:var(--orange);margin:8px 0}
+.action{background:#292929;color:white;border-radius:12px;padding:12px 15px;margin:4px 4px 4px 0;font-weight:750}
+.action.primary{background:linear-gradient(135deg,#ff9a3d,#f06b0b);color:#17100a}
+.action:active,.gear:active,.tab:active{transform:scale(.97)}
+.field{display:block;color:#bbb;font-size:12px;margin:12px 0 5px}
+input,textarea,select{width:100%;background:#0c0c0c;color:white;border:1px solid #383838;border-radius:12px;padding:13px;margin:4px 0 8px;outline:none}
+input:focus,textarea:focus,select:focus{border-color:var(--orange)}
+.entry{padding:11px 0;border-bottom:1px solid #303030}.entry:last-child{border:0}
+.stat{display:inline-block;background:#242424;padding:10px 12px;border-radius:12px;margin:4px;font-size:12px}
+.progress{height:8px;background:#303030;border-radius:99px;overflow:hidden;margin:12px 0}
+.progress span{display:block;height:100%;background:linear-gradient(90deg,#f06b0b,#ffb15e);width:0}
+.tabs{position:fixed;z-index:5;bottom:0;left:0;right:0;display:flex;justify-content:space-around;gap:2px;padding:8px 4px calc(8px + env(safe-area-inset-bottom));background:#101010ed;border-top:1px solid #333;backdrop-filter:blur(14px)}
+.tab{flex:1;min-width:0;background:transparent;color:#858585;border-radius:12px;padding:7px 1px 6px;display:flex;flex-direction:column;align-items:center;gap:4px;font-size:9px;font-weight:700}
+.tab .ico{font-size:19px;line-height:22px}
+.tab.active{color:var(--orange);background:#ff841f14}
+.hidden{display:none!important}
+.language-row{display:flex;gap:8px;flex-wrap:wrap}
+.language-row button{flex:1;min-width:90px}
+.note{color:#888;font-size:11px;line-height:1.5}
+@media(min-width:600px){.tabs{left:50%;transform:translateX(-50%);width:min(100%,720px);border-radius:18px 18px 0 0}.tab{font-size:11px}}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <div class="brand">SAYMON <span>LIFE AI</span></div>
+  <button class="gear" aria-label="Settings" onclick="showPage('settings')">⚙</button>
+</div>
+<main>
+<section id="home" class="active">
+  <div class="welcome">
+    <div class="eyebrow">YOUR PERSONAL SPACE</div>
+    <h1 id="welcomeLine">WELCOME <span>TO SAYMON</span></h1>
+    <p id="tagline">YOUR LIFE. YOUR RULES.</p>
+    <div class="home-summary" id="homeSummary"></div>
+    <button class="action primary" onclick="showPage('water')" id="homeWaterBtn">Track your water</button>
+  </div>
+  <div class="card">
+    <h2 id="overviewTitle">Today at a glance</h2>
+    <div id="overviewStats"></div>
+    <button class="action" onclick="showPage('stats')" id="statsBtn">Statistics</button>
+  </div>
 </section>
-<section id="food" class="hidden"><h1>🍽 Питание</h1><div class="card"><label>Что ел?</label><input id="foodText" placeholder="Например: обед"><label>Заметка (необязательно)</label><textarea id="foodNote" placeholder="Количество, комментарий..."></textarea><button class="primary" onclick="save('Питание','foodText','foodNote')">Сохранить</button></div><div id="foodList" class="card"></div></section>
-<section id="sport" class="hidden"><h1>💪 Спорт</h1><div class="card"><label>Упражнение</label><input id="sportText" placeholder="Например: отжимания"><label>Повторы / время / заметка</label><input id="sportNote" placeholder="Например: 15 повторений"><button class="primary" onclick="save('Тренировка','sportText','sportNote')">Сохранить</button></div><div id="sportList" class="card"></div></section>
-<section id="sleep" class="hidden"><h1>🌙 Сон</h1><div class="card"><label>Сколько спал (часы)</label><input id="sleepText" type="number" step=".5" placeholder="Например: 8"><label>Как себя чувствуешь?</label><input id="sleepNote" placeholder="Например: нормально"><button class="primary" onclick="save('Сон','sleepText','sleepNote')">Сохранить</button></div><div id="sleepList" class="card"></div></section>
-<section id="health" class="hidden"><h1>❤️ Здоровье</h1><div class="card"><input id="healthText" placeholder="Самочувствие / заметка"><input id="healthNote" placeholder="Дополнительная информация"><button class="primary" onclick="save('Здоровье','healthText','healthNote')">Сохранить</button></div><div id="healthList" class="card"></div></section>
-<section id="hobbies" class="hidden"><h1>🎯 Хобби и цели</h1><div class="card"><input id="hobbiesText" placeholder="Чем занимался?"><input id="hobbiesNote" placeholder="Результат / заметка"><button class="primary" onclick="save('Хобби','hobbiesText','hobbiesNote')">Сохранить</button></div><div id="hobbiesList" class="card"></div></section>
-<section id="stats" class="hidden"><h1>📊 Статистика</h1><div class="card" id="statsContent"></div></section>
-<section id="ai" class="hidden"><h1>✦ AI-помощник</h1><div class="card"><p>Раздел подготовлен. Для настоящего AI-чата потребуется подключение к интернету и API-ключ. Не вводи сюда пароли или личные секреты.</p></div></section>
-<section id="settings" class="hidden"><h1>⚙️ Настройки</h1><div class="card"><p>Цель воды: <b id="settingsGoal"></b> мл</p><button onclick="setGoal()">Изменить цель воды</button><p class="muted">Записи хранятся локально на этом устройстве в приложении.</p></div></section>
+
+<section id="water">
+  <h1 class="section-title" data-i18n="waterTitle">💧 Water</h1>
+  <div class="card">
+    <h2 data-i18n="todayWater">Water today</h2>
+    <div class="big-number"><span id="waterValue">0</span><span class="muted"> / <span id="goalValue">3000</span> ml</span></div>
+    <div class="progress"><span id="waterProgress"></span></div>
+    <div class="muted" data-i18n="dailyGoal">Your daily goal</div>
+    <button class="action primary" onclick="addWater(200)">+200 ml</button>
+    <button class="action" onclick="addWater(300)">+300 ml</button>
+    <button class="action" onclick="addWater(500)">+500 ml</button>
+    <button class="action" onclick="changeGoal()" data-i18n="changeGoal">Change goal</button>
+  </div>
+</section>
+
+<section id="food">
+  <h1 class="section-title" data-i18n="foodTitle">🍽 Food</h1>
+  <div class="card">
+    <label class="field" data-i18n="whatAte">What did you eat?</label><input id="foodText" placeholder="e.g. lunch">
+    <label class="field" data-i18n="noteOptional">Note (optional)</label><textarea id="foodNote" placeholder="Amount, comment..."></textarea>
+    <button class="action primary" onclick="saveEntry('food','foodText','foodNote')" data-i18n="save">Save</button>
+  </div>
+  <div class="card"><h2 data-i18n="entries">Entries</h2><div id="foodList"></div></div>
+</section>
+
+<section id="sport">
+  <h1 class="section-title" data-i18n="sportHealthTitle">🏋️ Sport / Health</h1>
+  <div class="card">
+    <h2 data-i18n="training">Training</h2>
+    <label class="field" data-i18n="exercise">Exercise</label><input id="sportText" placeholder="e.g. push-ups">
+    <label class="field" data-i18n="repsNote">Reps / time / note</label><input id="sportNote" placeholder="e.g. 15 reps">
+    <button class="action primary" onclick="saveEntry('sport','sportText','sportNote')" data-i18n="save">Save</button>
+  </div>
+  <div class="card">
+    <h2 data-i18n="health">Health</h2>
+    <label class="field" data-i18n="howFeel">How are you feeling?</label><input id="healthText" placeholder="Well-being / note">
+    <label class="field" data-i18n="extraInfo">Additional information</label><input id="healthNote" placeholder="Optional">
+    <button class="action primary" onclick="saveEntry('health','healthText','healthNote')" data-i18n="save">Save</button>
+  </div>
+  <div class="card"><h2 data-i18n="entries">Entries</h2><div id="sportList"></div><div id="healthList"></div></div>
+</section>
+
+<section id="sleep">
+  <h1 class="section-title" data-i18n="sleepTitle">🌙 Sleep</h1>
+  <div class="card">
+    <label class="field" data-i18n="hoursSlept">How many hours did you sleep?</label><input id="sleepText" type="number" step=".5" placeholder="e.g. 8">
+    <label class="field" data-i18n="howFeel">How are you feeling?</label><input id="sleepNote" placeholder="e.g. rested">
+    <button class="action primary" onclick="saveEntry('sleep','sleepText','sleepNote')" data-i18n="save">Save</button>
+  </div>
+  <div class="card"><h2 data-i18n="entries">Entries</h2><div id="sleepList"></div></div>
+</section>
+
+<section id="hobbies">
+  <h1 class="section-title" data-i18n="hobbiesTitle">🎯 Hobbies</h1>
+  <div class="card">
+    <label class="field" data-i18n="whatDid">What did you do?</label><input id="hobbiesText" placeholder="Your activity">
+    <label class="field" data-i18n="resultNote">Result / note</label><input id="hobbiesNote" placeholder="Optional note">
+    <button class="action primary" onclick="saveEntry('hobbies','hobbiesText','hobbiesNote')" data-i18n="save">Save</button>
+  </div>
+  <div class="card"><h2 data-i18n="entries">Entries</h2><div id="hobbiesList"></div></div>
+</section>
+
+<section id="ai">
+  <h1 class="section-title" data-i18n="aiTitle">✦ AI assistant</h1>
+  <div class="card"><p data-i18n="aiPlaceholder">Your AI assistant space. A real AI chat requires a secure server connection.</p></div>
+</section>
+
+<section id="stats">
+  <h1 class="section-title" data-i18n="statsTitle">📊 Statistics</h1>
+  <div class="card" id="statsContent"></div>
+</section>
+
+<section id="settings">
+  <h1 class="section-title" data-i18n="settingsTitle">⚙ Settings</h1>
+  <div class="card">
+    <h2 data-i18n="language">Language</h2>
+    <div class="language-row">
+      <button class="action" onclick="setLanguage('en')">English</button>
+      <button class="action" onclick="setLanguage('uk')">Українська</button>
+      <button class="action" onclick="setLanguage('ru')">Русский</button>
+    </div>
+  </div>
+  <div class="card">
+    <h2 data-i18n="waterSettings">Water goal</h2>
+    <p><b id="settingsGoal">3000</b> ml</p>
+    <button class="action primary" onclick="changeGoal()" data-i18n="changeGoal">Change goal</button>
+    <p class="note" data-i18n="localStorageNote">Your entries are stored on this device in this browser/app.</p>
+  </div>
+</section>
+</main>
+
 <nav class="tabs">
-<button onclick="show('home')">⌂ Главная</button><button onclick="show('food')">🍽 Еда</button><button onclick="show('sport')">💪 Спорт</button><button onclick="show('sleep')">🌙 Сон</button><button onclick="show('health')">❤️ Здоровье</button><button onclick="show('hobbies')">🎯 Хобби</button><button onclick="show('stats')">📊 Статы</button><button onclick="show('ai')">✦ AI</button><button onclick="show('settings')">⚙️</button>
+  <button class="tab active" data-page="home" onclick="showPage('home')"><span class="ico">⌂</span><span data-i18n="navHome">Home</span></button>
+  <button class="tab" data-page="water" onclick="showPage('water')"><span class="ico">♧</span><span data-i18n="navWater">Water</span></button>
+  <button class="tab" data-page="food" onclick="showPage('food')"><span class="ico">♨</span><span data-i18n="navFood">Food</span></button>
+  <button class="tab" data-page="sport" onclick="showPage('sport')"><span class="ico">✦</span><span data-i18n="navSport">Sport</span></button>
+  <button class="tab" data-page="sleep" onclick="showPage('sleep')"><span class="ico">☾</span><span data-i18n="navSleep">Sleep</span></button>
+  <button class="tab" data-page="hobbies" onclick="showPage('hobbies')"><span class="ico">◇</span><span data-i18n="navHobbies">Hobbies</span></button>
+  <button class="tab" data-page="ai" onclick="showPage('ai')"><span class="ico">✧</span><span data-i18n="navAI">AI</span></button>
 </nav>
+
 <script>
+const translations={
+en:{welcome:'WELCOME',toSaymon:'TO SAYMON',tagline:'YOUR LIFE. YOUR RULES.',homeWaterBtn:'Track your water',overviewTitle:'Today at a glance',statsBtn:'Statistics',waterTitle:'💧 Water',todayWater:'Water today',dailyGoal:'Your daily goal',changeGoal:'Change goal',foodTitle:'🍽 Food',whatAte:'What did you eat?',noteOptional:'Note (optional)',save:'Save',entries:'Entries',sportHealthTitle:'🏋️ Sport / Health',training:'Training',exercise:'Exercise',repsNote:'Reps / time / note',health:'Health',howFeel:'How are you feeling?',extraInfo:'Additional information',sleepTitle:'🌙 Sleep',hoursSlept:'How many hours did you sleep?',hobbiesTitle:'🎯 Hobbies',whatDid:'What did you do?',resultNote:'Result / note',aiTitle:'✦ AI assistant',aiPlaceholder:'Your AI assistant space. A real AI chat requires a secure server connection.',statsTitle:'📊 Statistics',settingsTitle:'⚙ Settings',language:'Language',waterSettings:'Water goal',localStorageNote:'Your entries are stored on this device in this browser/app.',navHome:'Home',navWater:'Water',navFood:'Food',navSport:'Sport',navSleep:'Sleep',navHobbies:'Hobbies',navAI:'AI',empty:'No entries yet.',waterSummary:'Water',records:'Records',days:'Days with data',totalEntries:'Total entries',goalPrompt:'Daily water goal in ml',fillMain:'Please fill in the main field.',saved:'Saved'},
+uk:{welcome:'ВІТАЄМО',toSaymon:'У SAYMON',tagline:'ТВОЄ ЖИТТЯ. ТВОЇ ПРАВИЛА.',homeWaterBtn:'Записати воду',overviewTitle:'Сьогодні коротко',statsBtn:'Статистика',waterTitle:'💧 Вода',todayWater:'Води сьогодні',dailyGoal:'Твоя денна ціль',changeGoal:'Змінити ціль',foodTitle:'🍽 Їжа',whatAte:'Що ти їв?',noteOptional:'Нотатка (необов’язково)',save:'Зберегти',entries:'Записи',sportHealthTitle:'🏋️ Спорт / Здоров’я',training:'Тренування',exercise:'Вправа',repsNote:'Повтори / час / нотатка',health:'Здоров’я',howFeel:'Як ти почуваєшся?',extraInfo:'Додаткова інформація',sleepTitle:'🌙 Сон',hoursSlept:'Скільки годин ти спав?',hobbiesTitle:'🎯 Хобі',whatDid:'Чим ти займався?',resultNote:'Результат / нотатка',aiTitle:'✦ AI-помічник',aiPlaceholder:'Тут буде твій AI-помічник. Для справжнього AI-чату потрібне захищене підключення до сервера.',statsTitle:'📊 Статистика',settingsTitle:'⚙ Налаштування',language:'Мова',waterSettings:'Ціль води',localStorageNote:'Записи зберігаються на цьому пристрої у браузері/застосунку.',navHome:'Головна',navWater:'Вода',navFood:'Їжа',navSport:'Спорт',navSleep:'Сон',navHobbies:'Хобі',navAI:'AI',empty:'Записів поки немає.',waterSummary:'Вода',records:'Записів',days:'Днів із даними',totalEntries:'Усього записів',goalPrompt:'Денна ціль води у мл',fillMain:'Заповни основне поле.',saved:'Збережено'},
+ru:{welcome:'ДОБРО ПОЖАЛОВАТЬ',toSaymon:'В SAYMON',tagline:'ТВОЯ ЖИЗНЬ. ТВОИ ПРАВИЛА.',homeWaterBtn:'Записать воду',overviewTitle:'Сегодня вкратце',statsBtn:'Статистика',waterTitle:'💧 Вода',todayWater:'Воды сегодня',dailyGoal:'Твоя дневная цель',changeGoal:'Изменить цель',foodTitle:'🍽 Еда',whatAte:'Что ты ел?',noteOptional:'Заметка (необязательно)',save:'Сохранить',entries:'Записи',sportHealthTitle:'🏋️ Спорт / Здоровье',training:'Тренировка',exercise:'Упражнение',repsNote:'Повторы / время / заметка',health:'Здоровье',howFeel:'Как ты себя чувствуешь?',extraInfo:'Дополнительная информация',sleepTitle:'🌙 Сон',hoursSlept:'Сколько часов ты спал?',hobbiesTitle:'🎯 Хобби',whatDid:'Чем занимался?',resultNote:'Результат / заметка',aiTitle:'✦ AI-помощник',aiPlaceholder:'Здесь будет твой AI-помощник. Для настоящего AI-чата нужно безопасное подключение к серверу.',statsTitle:'📊 Статистика',settingsTitle:'⚙ Настройки',language:'Язык',waterSettings:'Цель воды',localStorageNote:'Записи хранятся на этом устройстве в браузере/приложении.',navHome:'Главная',navWater:'Вода',navFood:'Еда',navSport:'Спорт',navSleep:'Сон',navHobbies:'Хобби',navAI:'AI',empty:'Записей пока нет.',waterSummary:'Вода',records:'Записей',days:'Дней с данными',totalEntries:'Всего записей',goalPrompt:'Дневная цель воды в мл',fillMain:'Заполни основное поле.',saved:'Сохранено'}
+};
 const day=()=>new Date().toISOString().slice(0,10);
-let data=JSON.parse(localStorage.getItem('saymon_data')||'{}');
+let data={};try{data=JSON.parse(localStorage.getItem('saymon_data')||'{}')||{}}catch(e){data={}}
+let lang=localStorage.getItem('saymon_lang')||'en';
+function tr(k){return (translations[lang]||translations.en)[k]||translations.en[k]||k}
 function persist(){localStorage.setItem('saymon_data',JSON.stringify(data));render()}
-function today(){if(!data[day()])data[day()]={water:0,items:[]};return data[day()]}
+function today(){if(!data[day()])data[day()]={water:0,items:[]};if(!Array.isArray(data[day()].items))data[day()].items=[];return data[day()]}
 function addWater(n){today().water+=n;persist()}
-function setGoal(){let v=prompt('Дневная цель воды в мл',data.goal||3000);if(v&&Number(v)>0){data.goal=Number(v);persist()}}
-function save(type,a,b){let x=document.getElementById(a),y=document.getElementById(b);if(!x.value.trim())return alert('Заполни основное поле');today().items.push({type,a:x.value,b:y.value,time:new Date().toLocaleTimeString()});x.value='';y.value='';persist()}
-function show(id){document.querySelectorAll('body>section').forEach(s=>s.classList.add('hidden'));document.getElementById(id).classList.remove('hidden');render()}
-function list(id,type){let items=today().items.filter(x=>x.type===type).slice().reverse();document.getElementById(id).innerHTML=items.length?items.map(x=>`<div class="entry"><b>${esc(x.a)}</b><div class="muted">${esc(x.b||'') } · ${x.time}</div></div>`).join(''):'<span class="muted">Записей пока нет.</span>'}
-function esc(s){return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
-function render(){let t=today(),g=data.goal||3000;document.getElementById('water').textContent=t.water;document.getElementById('goalLabel').textContent=g;document.getElementById('settingsGoal').textContent=g;document.getElementById('today').textContent=new Date().toLocaleDateString('ru-RU',{weekday:'long',day:'numeric',month:'long'});['food','sport','sleep','health','hobbies'].forEach(k=>list(k+'List',({food:'Питание',sport:'Тренировка',sleep:'Сон',health:'Здоровье',hobbies:'Хобби'})[k]));document.getElementById('summary').textContent=`Вода: ${t.water} мл · Записей: ${t.items.length}`;let all=Object.values(data).filter(v=>v&&Array.isArray(v.items));document.getElementById('statsContent').innerHTML=`<div class="stat">Дней с данными: ${all.length}</div><div class="stat">Всего записей: ${all.reduce((n,v)=>n+v.items.length,0)}</div><div class="stat">Вода сегодня: ${t.water} мл</div>`}
-render();
-</script><script>
-if ("serviceWorker" in navigator) {
-  window.addEventListener("load", () => {
-    navigator.serviceWorker.register("./sw.js");
-  });
+function changeGoal(){let v=prompt(tr('goalPrompt'),data.goal||3000);if(v&&Number(v)>0){data.goal=Number(v);persist()}}
+function setLanguage(value){lang=value;localStorage.setItem('saymon_lang',lang);applyLanguage();render()}
+function applyLanguage(){
+ document.documentElement.lang=lang;
+ document.querySelectorAll('[data-i18n]').forEach(el=>{const k=el.getAttribute('data-i18n');el.textContent=tr(k)});
+ document.getElementById('welcomeLine').innerHTML=tr('welcome')+' <span>'+tr('toSaymon')+'</span>';
+ document.getElementById('tagline').textContent=tr('tagline');
 }
-</script>   </body></html>
+function showPage(id){document.querySelectorAll('main section').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('active',b.dataset.page===id));render();window.scrollTo(0,0)}
+function saveEntry(type,a,b){const x=document.getElementById(a),y=document.getElementById(b);if(!x.value.trim())return alert(tr('fillMain'));today().items.push({type,a:x.value,b:y.value,time:new Date().toLocaleTimeString()});x.value='';y.value='';persist()}
+function esc(s){return String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
+function list(id,type){const el=document.getElementById(id);if(!el)return;const aliases={food:['food','Питание'],sport:['sport','Тренировка'],health:['health','Здоровье'],sleep:['sleep','Сон'],hobbies:['hobbies','Хобби']};const items=today().items.filter(x=>(aliases[type]||[type]).includes(x.type)).slice().reverse();el.innerHTML=items.length?items.map(x=>`<div class="entry"><b>${esc(x.a)}</b><div class="muted">${esc(x.b||'')} · ${esc(x.time||'')}</div></div>`).join(''):`<span class="muted">${tr('empty')}</span>`}
+function render(){
+ const t=today(),g=data.goal||3000;
+ document.getElementById('waterValue').textContent=t.water||0;
+ document.getElementById('goalValue').textContent=g;
+ document.getElementById('settingsGoal').textContent=g;
+ document.getElementById('waterProgress').style.width=Math.min(100,(t.water||0)/g*100)+'%';
+ const total=t.items.length;
+ document.getElementById('homeSummary').textContent=tr('waterSummary')+': '+(t.water||0)+' ml  •  '+tr('records')+': '+total;
+ document.getElementById('overviewStats').innerHTML=`<span class="stat">${tr('waterSummary')}: ${t.water||0} ml</span><span class="stat">${tr('records')}: ${total}</span>`;
+ list('foodList','food');list('sportList','sport');list('healthList','health');list('sleepList','sleep');list('hobbiesList','hobbies');
+ const all=Object.values(data).filter(v=>v&&Array.isArray(v.items));
+ document.getElementById('statsContent').innerHTML=`<span class="stat">${tr('days')}: ${all.length}</span><span class="stat">${tr('totalEntries')}: ${all.reduce((n,v)=>n+v.items.length,0)}</span><span class="stat">${tr('waterSummary')}: ${t.water||0} ml</span>`;
+}
+applyLanguage();render();
+</script>
+<script>
+if("serviceWorker" in navigator){window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js").catch(()=>{}));}
+</script>
+</body>
+                                                               </html>
+                                                               
