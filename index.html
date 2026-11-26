@@ -1,5 +1,4 @@
-
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ru">
 <head>
 <meta charset="utf-8">
@@ -48,6 +47,7 @@ input:focus,textarea:focus,select:focus{border-color:var(--orange)}
 .language-row{display:flex;gap:8px;flex-wrap:wrap}
 .language-row button{flex:1;min-width:90px}
 .note{color:#888;font-size:11px;line-height:1.5}
+
 .modal-backdrop{position:fixed;inset:0;z-index:20;background:#000c;display:none;align-items:center;justify-content:center;padding:20px}
 .modal-backdrop.open{display:flex}
 .modal{width:min(100%,390px);background:linear-gradient(145deg,#202020,#111);border:1px solid #49301d;border-radius:22px;padding:22px;box-shadow:0 24px 80px #000b}
@@ -101,6 +101,7 @@ input:focus,textarea:focus,select:focus{border-color:var(--orange)}
   </div>
   <div class="card"><h2 data-i18n="entries">Entries</h2><div id="foodList"></div></div>
 </section>
+
 <section id="sport">
   <h1 class="section-title" data-i18n="sportHealthTitle">🏋️ Sport / Health</h1>
   <div class="card">
@@ -196,7 +197,6 @@ en:{welcome:'WELCOME',toSaymon:'TO SAYMON',tagline:'YOUR LIFE. YOUR RULES.',home
 uk:{welcome:'ВІТАЄМО',toSaymon:'У SAYMON',tagline:'ТВОЄ ЖИТТЯ. ТВОЇ ПРАВИЛА.',homeWaterBtn:'Записати воду',overviewTitle:'Сьогодні коротко',statsBtn:'Статистика',waterTitle:'💧 Вода',todayWater:'Води сьогодні',dailyGoal:'Твоя денна ціль',changeGoal:'Змінити ціль',foodTitle:'🍽 Їжа',whatAte:'Що ти їв?',noteOptional:'Нотатка (необов’язково)',save:'Зберегти',entries:'Записи',sportHealthTitle:'🏋️ Спорт / Здоров’я',training:'Тренування',exercise:'Вправа',repsNote:'Повтори / час / нотатка',health:'Здоров’я',howFeel:'Як ти почуваєшся?',extraInfo:'Додаткова інформація',sleepTitle:'🌙 Сон',hoursSlept:'Скільки годин ти спав?',hobbiesTitle:'🎯 Хобі',whatDid:'Чим ти займався?',resultNote:'Результат / нотатка',aiTitle:'✦ AI-помічник',aiPlaceholder:'Тут буде твій AI-помічник. Для справжнього AI-чату потрібне захищене підключення до сервера.',statsTitle:'📊 Статистика',settingsTitle:'⚙ Налаштування',language:'Мова',waterSettings:'Ціль води',localStorageNote:'Записи зберігаються на цьому пристрої у браузері/застосунку.',navHome:'Головна',navWater:'Вода',navFood:'Їжа',navSport:'Спорт',navSleep:'Сон',navHobbies:'Хобі',navAI:'AI',empty:'Записів поки немає.',waterSummary:'Вода',records:'Записів',days:'Днів із даними',totalEntries:'Усього записів',goalPrompt:'Денна ціль води у мл',fillMain:'Заповни основне поле.',editAmount:'Змінити кількість',cancel:'Скасувати',modalAmountTitle:'Змінити кількість води',modalGoalTitle:'Змінити денну ціль',modalAmountDesc:'Вкажи, скільки води ти вже випив сьогодні.',modalGoalDesc:'Вкажи свою денну ціль води.',amountLabel:'Випито сьогодні (мл)',goalLabel:'Денна ціль (мл)',saved:'Збережено'},
 ru:{welcome:'ДОБРО ПОЖАЛОВАТЬ',toSaymon:'В SAYMON',tagline:'ТВОЯ ЖИЗНЬ. ТВОИ ПРАВИЛА.',homeWaterBtn:'Записать воду',overviewTitle:'Сегодня вкратце',statsBtn:'Статистика',waterTitle:'💧 Вода',todayWater:'Воды сегодня',dailyGoal:'Твоя дневная цель',changeGoal:'Изменить цель',foodTitle:'🍽 Еда',whatAte:'Что ты ел?',noteOptional:'Заметка (необязательно)',save:'Сохранить',entries:'Записи',sportHealthTitle:'🏋️ Спорт / Здоровье',training:'Тренировка',exercise:'Упражнение',repsNote:'Повторы / время / заметка',health:'Здоровье',howFeel:'Как ты себя чувствуешь?',extraInfo:'Дополнительная информация',sleepTitle:'🌙 Сон',hoursSlept:'Сколько часов ты спал?',hobbiesTitle:'🎯 Хобби',whatDid:'Чем занимался?',resultNote:'Результат / заметка',aiTitle:'✦ AI-помощник',aiPlaceholder:'Здесь будет твой AI-помощник. Для настоящего AI-чата нужно безопасное подключение к серверу.',statsTitle:'📊 Статистика',settingsTitle:'⚙ Настройки',language:'Язык',waterSettings:'Цель воды',localStorageNote:'Записи хранятся на этом устройстве в браузере/приложении.',navHome:'Главная',navWater:'Вода',navFood:'Еда',navSport:'Спорт',navSleep:'Сон',navHobbies:'Хобби',navAI:'AI',empty:'Записей пока нет.',waterSummary:'Вода',records:'Записей',days:'Дней с данными',totalEntries:'Всего записей',goalPrompt:'Дневная цель воды в мл',fillMain:'Заполни основное поле.',editAmount:'Изменить количество',cancel:'Отмена',modalAmountTitle:'Изменить количество воды',modalGoalTitle:'Изменить дневную цель',modalAmountDesc:'Укажи, сколько воды ты уже выпил сегодня.',modalGoalDesc:'Укажи свою дневную цель воды.',amountLabel:'Выпито сегодня (мл)',goalLabel:'Дневная цель (мл)',saved:'Сохранено'}
 };
-  
 const day=()=>new Date().toISOString().slice(0,10);
 let data={};try{data=JSON.parse(localStorage.getItem('saymon_data')||'{}')||{}}catch(e){data={}}
 let lang=localStorage.getItem('saymon_lang')||'en';
@@ -233,24 +233,5 @@ function applyLanguage(){
 }
 function showPage(id){document.querySelectorAll('main section').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('active',b.dataset.page===id));render();window.scrollTo(0,0)}
 function saveEntry(type,a,b){const x=document.getElementById(a),y=document.getElementById(b);if(!x.value.trim())return alert(tr('fillMain'));today().items.push({type,a:x.value,b:y.value,time:new Date().toLocaleTimeString()});x.value='';y.value='';persist()}
-function esc(s){return String(s??'').replace(/[&<>\"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;'}[c]))}
-function list(id,type){const el=document.getElementById(id);if(!el)return;const aliases={food:['food','Питание'],sport:['sport','Тренировка'],health:['health','Здоровье'],sleep:['sleep','Сон'],hobbies:['hobbies','Хобби']};const items=today().items.filter(x=>(aliases[type]||[type]).includes(x.type)).slice().reverse();el.innerHTML=items.length?items.map(x=>`<div class="entry"><b>${esc(x.a)}</b><div class="muted">${esc(x.b||'')} · ${esc(x.time||'')}</div></div>`).join(''):`<span class="muted">${tr('empty')}</span>`}
-function render(){
- const t=today(),g=data.goal||3000;
- document.getElementById('waterValue').textContent=t.water||0;
- document.getElementById('goalValue').textContent=g;
- document.getElementById('settingsGoal').textContent=g;
- document.getElementById('waterProgress').style.width=Math.min(100,(t.water||0)/g*100)+'%';
- const total=t.items.length;
- document.getElementById('homeSummary').textContent=tr('waterSummary')+': '+(t.water||0)+' ml  •  '+tr('records')+': '+total;
- list('foodList','food');list('sportList','sport');list('healthList','health');list('sleepList','sleep');list('hobbiesList','hobbies');
- const all=Object.values(data).filter(v=>v&&Array.isArray(v.items));
- document.getElementById('statsContent').innerHTML=`<span class="stat">${tr('days')}: ${all.length}</span><span class="stat">${tr('totalEntries')}: ${all.reduce((n,v)=>n+v.items.length,0)}</span><span class="stat">${tr('waterSummary')}: ${t.water||0} ml</span>`;
-}
-applyLanguage();render();
-</script>
-<script>
-if("serviceWorker" in navigator){window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js").catch(()=>{}));}
-</script>
-</body>
-</html>
+function esc(s){return String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
+function list(id,type){const el=document.getElementById(id);if(!el)return;const aliases={food:['food','Питание'],sport:['sport','Тренировка'],health:['health','Здоровье'],sleep:['sleep','Сон'],hobbies:['hobbies'
