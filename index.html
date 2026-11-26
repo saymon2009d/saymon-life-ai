@@ -1,6 +1,6 @@
 <!doctype html>
 <html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="theme-color" content="#090d18"><title>SAYMON LIFE AI</title>
+<meta name="them<e-color" content="#090d18"><link rel="manifest" href="./manifest.json"<title>SAYMON LIFE AI</title>
 <style>
 *{box-sizing:border-box}body{margin:0;background:#090d18;color:#eef2ff;font:15px Arial,sans-serif;padding:20px 16px 90px}
 header{display:flex;justify-content:space-between;align-items:center;margin:8px 0 22px}
@@ -48,4 +48,10 @@ function list(id,type){let items=today().items.filter(x=>x.type===type).slice().
 function esc(s){return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
 function render(){let t=today(),g=data.goal||3000;document.getElementById('water').textContent=t.water;document.getElementById('goalLabel').textContent=g;document.getElementById('settingsGoal').textContent=g;document.getElementById('today').textContent=new Date().toLocaleDateString('ru-RU',{weekday:'long',day:'numeric',month:'long'});['food','sport','sleep','health','hobbies'].forEach(k=>list(k+'List',({food:'Питание',sport:'Тренировка',sleep:'Сон',health:'Здоровье',hobbies:'Хобби'})[k]));document.getElementById('summary').textContent=`Вода: ${t.water} мл · Записей: ${t.items.length}`;let all=Object.values(data).filter(v=>v&&Array.isArray(v.items));document.getElementById('statsContent').innerHTML=`<div class="stat">Дней с данными: ${all.length}</div><div class="stat">Всего записей: ${all.reduce((n,v)=>n+v.items.length,0)}</div><div class="stat">Вода сегодня: ${t.water} мл</div>`}
 render();
-</script></body></html>
+</script><script>
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("./sw.js");
+  });
+}
+</script>   </body></html>
