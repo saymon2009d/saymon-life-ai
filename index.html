@@ -1,4 +1,4 @@
-<!doctype html>
+!doctype html>
 <html lang="ru">
 <head>
 <meta charset="utf-8">
@@ -47,6 +47,14 @@ input:focus,textarea:focus,select:focus{border-color:var(--orange)}
 .language-row{display:flex;gap:8px;flex-wrap:wrap}
 .language-row button{flex:1;min-width:90px}
 .note{color:#888;font-size:11px;line-height:1.5}
+
+.modal-backdrop{position:fixed;inset:0;z-index:20;background:#000c;display:none;align-items:center;justify-content:center;padding:20px}
+.modal-backdrop.open{display:flex}
+.modal{width:min(100%,390px);background:linear-gradient(145deg,#202020,#111);border:1px solid #49301d;border-radius:22px;padding:22px;box-shadow:0 24px 80px #000b}
+.modal h2{margin:0 0 8px;font-size:20px}
+.modal p{margin:0 0 14px;color:#aaa;font-size:12px;line-height:1.5}
+.modal-actions{display:flex;gap:8px;margin-top:14px}
+.modal-actions button{flex:1;margin:0}
 @media(min-width:600px){.tabs{left:50%;transform:translateX(-50%);width:min(100%,720px);border-radius:18px 18px 0 0}.tab{font-size:11px}}
 </style>
 </head>
@@ -64,11 +72,6 @@ input:focus,textarea:focus,select:focus{border-color:var(--orange)}
     <div class="home-summary" id="homeSummary"></div>
     <button class="action primary" onclick="showPage('water')" id="homeWaterBtn">Track your water</button>
   </div>
-  <div class="card">
-    <h2 id="overviewTitle">Today at a glance</h2>
-    <div id="overviewStats"></div>
-    <button class="action" onclick="showPage('stats')" id="statsBtn">Statistics</button>
-  </div>
 </section>
 
 <section id="water">
@@ -81,7 +84,11 @@ input:focus,textarea:focus,select:focus{border-color:var(--orange)}
     <button class="action primary" onclick="addWater(200)">+200 ml</button>
     <button class="action" onclick="addWater(300)">+300 ml</button>
     <button class="action" onclick="addWater(500)">+500 ml</button>
-    <button class="action" onclick="changeGoal()" data-i18n="changeGoal">Change goal</button>
+    <button class="action" onclick="removeWater(200)">−200 ml</button>
+    <button class="action" onclick="removeWater(300)">−300 ml</button>
+    <button class="action" onclick="removeWater(500)">−500 ml</button>
+    <button class="action" onclick="openModal('amount')" data-i18n="editAmount">Edit amount</button>
+    <button class="action" onclick="openModal('goal')" data-i18n="changeGoal">Change goal</button>
   </div>
 </section>
 
@@ -155,11 +162,24 @@ input:focus,textarea:focus,select:focus{border-color:var(--orange)}
   <div class="card">
     <h2 data-i18n="waterSettings">Water goal</h2>
     <p><b id="settingsGoal">3000</b> ml</p>
-    <button class="action primary" onclick="changeGoal()" data-i18n="changeGoal">Change goal</button>
+    <button class="action primary" onclick="openModal('goal')" data-i18n="changeGoal">Change goal</button>
     <p class="note" data-i18n="localStorageNote">Your entries are stored on this device in this browser/app.</p>
   </div>
 </section>
 </main>
+
+<div class="modal-backdrop" id="editModal" role="dialog" aria-modal="true" aria-labelledby="modalTitle" onclick="if(event.target===this)closeModal()">
+  <div class="modal">
+    <h2 id="modalTitle">Edit water</h2>
+    <p id="modalDescription">Enter the amount in millilitres.</p>
+    <label class="field" id="modalFieldLabel" for="modalNumber">Amount (ml)</label>
+    <input id="modalNumber" type="number" min="0" step="50" inputmode="numeric">
+    <div class="modal-actions">
+      <button class="action" onclick="closeModal()" data-i18n="cancel">Cancel</button>
+      <button class="action primary" onclick="saveModalValue()" data-i18n="save">Save</button>
+    </div>
+  </div>
+</div>
 
 <nav class="tabs">
   <button class="tab active" data-page="home" onclick="showPage('home')"><span class="ico">⌂</span><span data-i18n="navHome">Home</span></button>
@@ -173,9 +193,9 @@ input:focus,textarea:focus,select:focus{border-color:var(--orange)}
 
 <script>
 const translations={
-en:{welcome:'WELCOME',toSaymon:'TO SAYMON',tagline:'YOUR LIFE. YOUR RULES.',homeWaterBtn:'Track your water',overviewTitle:'Today at a glance',statsBtn:'Statistics',waterTitle:'💧 Water',todayWater:'Water today',dailyGoal:'Your daily goal',changeGoal:'Change goal',foodTitle:'🍽 Food',whatAte:'What did you eat?',noteOptional:'Note (optional)',save:'Save',entries:'Entries',sportHealthTitle:'🏋️ Sport / Health',training:'Training',exercise:'Exercise',repsNote:'Reps / time / note',health:'Health',howFeel:'How are you feeling?',extraInfo:'Additional information',sleepTitle:'🌙 Sleep',hoursSlept:'How many hours did you sleep?',hobbiesTitle:'🎯 Hobbies',whatDid:'What did you do?',resultNote:'Result / note',aiTitle:'✦ AI assistant',aiPlaceholder:'Your AI assistant space. A real AI chat requires a secure server connection.',statsTitle:'📊 Statistics',settingsTitle:'⚙ Settings',language:'Language',waterSettings:'Water goal',localStorageNote:'Your entries are stored on this device in this browser/app.',navHome:'Home',navWater:'Water',navFood:'Food',navSport:'Sport',navSleep:'Sleep',navHobbies:'Hobbies',navAI:'AI',empty:'No entries yet.',waterSummary:'Water',records:'Records',days:'Days with data',totalEntries:'Total entries',goalPrompt:'Daily water goal in ml',fillMain:'Please fill in the main field.',saved:'Saved'},
-uk:{welcome:'ВІТАЄМО',toSaymon:'У SAYMON',tagline:'ТВОЄ ЖИТТЯ. ТВОЇ ПРАВИЛА.',homeWaterBtn:'Записати воду',overviewTitle:'Сьогодні коротко',statsBtn:'Статистика',waterTitle:'💧 Вода',todayWater:'Води сьогодні',dailyGoal:'Твоя денна ціль',changeGoal:'Змінити ціль',foodTitle:'🍽 Їжа',whatAte:'Що ти їв?',noteOptional:'Нотатка (необов’язково)',save:'Зберегти',entries:'Записи',sportHealthTitle:'🏋️ Спорт / Здоров’я',training:'Тренування',exercise:'Вправа',repsNote:'Повтори / час / нотатка',health:'Здоров’я',howFeel:'Як ти почуваєшся?',extraInfo:'Додаткова інформація',sleepTitle:'🌙 Сон',hoursSlept:'Скільки годин ти спав?',hobbiesTitle:'🎯 Хобі',whatDid:'Чим ти займався?',resultNote:'Результат / нотатка',aiTitle:'✦ AI-помічник',aiPlaceholder:'Тут буде твій AI-помічник. Для справжнього AI-чату потрібне захищене підключення до сервера.',statsTitle:'📊 Статистика',settingsTitle:'⚙ Налаштування',language:'Мова',waterSettings:'Ціль води',localStorageNote:'Записи зберігаються на цьому пристрої у браузері/застосунку.',navHome:'Головна',navWater:'Вода',navFood:'Їжа',navSport:'Спорт',navSleep:'Сон',navHobbies:'Хобі',navAI:'AI',empty:'Записів поки немає.',waterSummary:'Вода',records:'Записів',days:'Днів із даними',totalEntries:'Усього записів',goalPrompt:'Денна ціль води у мл',fillMain:'Заповни основне поле.',saved:'Збережено'},
-ru:{welcome:'ДОБРО ПОЖАЛОВАТЬ',toSaymon:'В SAYMON',tagline:'ТВОЯ ЖИЗНЬ. ТВОИ ПРАВИЛА.',homeWaterBtn:'Записать воду',overviewTitle:'Сегодня вкратце',statsBtn:'Статистика',waterTitle:'💧 Вода',todayWater:'Воды сегодня',dailyGoal:'Твоя дневная цель',changeGoal:'Изменить цель',foodTitle:'🍽 Еда',whatAte:'Что ты ел?',noteOptional:'Заметка (необязательно)',save:'Сохранить',entries:'Записи',sportHealthTitle:'🏋️ Спорт / Здоровье',training:'Тренировка',exercise:'Упражнение',repsNote:'Повторы / время / заметка',health:'Здоровье',howFeel:'Как ты себя чувствуешь?',extraInfo:'Дополнительная информация',sleepTitle:'🌙 Сон',hoursSlept:'Сколько часов ты спал?',hobbiesTitle:'🎯 Хобби',whatDid:'Чем занимался?',resultNote:'Результат / заметка',aiTitle:'✦ AI-помощник',aiPlaceholder:'Здесь будет твой AI-помощник. Для настоящего AI-чата нужно безопасное подключение к серверу.',statsTitle:'📊 Статистика',settingsTitle:'⚙ Настройки',language:'Язык',waterSettings:'Цель воды',localStorageNote:'Записи хранятся на этом устройстве в браузере/приложении.',navHome:'Главная',navWater:'Вода',navFood:'Еда',navSport:'Спорт',navSleep:'Сон',navHobbies:'Хобби',navAI:'AI',empty:'Записей пока нет.',waterSummary:'Вода',records:'Записей',days:'Дней с данными',totalEntries:'Всего записей',goalPrompt:'Дневная цель воды в мл',fillMain:'Заполни основное поле.',saved:'Сохранено'}
+en:{welcome:'WELCOME',toSaymon:'TO SAYMON',tagline:'YOUR LIFE. YOUR RULES.',homeWaterBtn:'Track your water',overviewTitle:'Today at a glance',statsBtn:'Statistics',waterTitle:'💧 Water',todayWater:'Water today',dailyGoal:'Your daily goal',changeGoal:'Change goal',foodTitle:'🍽 Food',whatAte:'What did you eat?',noteOptional:'Note (optional)',save:'Save',entries:'Entries',sportHealthTitle:'🏋️ Sport / Health',training:'Training',exercise:'Exercise',repsNote:'Reps / time / note',health:'Health',howFeel:'How are you feeling?',extraInfo:'Additional information',sleepTitle:'🌙 Sleep',hoursSlept:'How many hours did you sleep?',hobbiesTitle:'🎯 Hobbies',whatDid:'What did you do?',resultNote:'Result / note',aiTitle:'✦ AI assistant',aiPlaceholder:'Your AI assistant space. A real AI chat requires a secure server connection.',statsTitle:'📊 Statistics',settingsTitle:'⚙ Settings',language:'Language',waterSettings:'Water goal',localStorageNote:'Your entries are stored on this device in this browser/app.',navHome:'Home',navWater:'Water',navFood:'Food',navSport:'Sport',navSleep:'Sleep',navHobbies:'Hobbies',navAI:'AI',empty:'No entries yet.',waterSummary:'Water',records:'Records',days:'Days with data',totalEntries:'Total entries',goalPrompt:'Daily water goal in ml',fillMain:'Please fill in the main field.',editAmount:'Edit amount',cancel:'Cancel',modalAmountTitle:'Edit today’s water',modalGoalTitle:'Change daily goal',modalAmountDesc:'Set how much water you have actually drunk today.',modalGoalDesc:'Set your daily water goal.',amountLabel:'Drunk today (ml)',goalLabel:'Daily goal (ml)',saved:'Saved'},
+uk:{welcome:'ВІТАЄМО',toSaymon:'У SAYMON',tagline:'ТВОЄ ЖИТТЯ. ТВОЇ ПРАВИЛА.',homeWaterBtn:'Записати воду',overviewTitle:'Сьогодні коротко',statsBtn:'Статистика',waterTitle:'💧 Вода',todayWater:'Води сьогодні',dailyGoal:'Твоя денна ціль',changeGoal:'Змінити ціль',foodTitle:'🍽 Їжа',whatAte:'Що ти їв?',noteOptional:'Нотатка (необов’язково)',save:'Зберегти',entries:'Записи',sportHealthTitle:'🏋️ Спорт / Здоров’я',training:'Тренування',exercise:'Вправа',repsNote:'Повтори / час / нотатка',health:'Здоров’я',howFeel:'Як ти почуваєшся?',extraInfo:'Додаткова інформація',sleepTitle:'🌙 Сон',hoursSlept:'Скільки годин ти спав?',hobbiesTitle:'🎯 Хобі',whatDid:'Чим ти займався?',resultNote:'Результат / нотатка',aiTitle:'✦ AI-помічник',aiPlaceholder:'Тут буде твій AI-помічник. Для справжнього AI-чату потрібне захищене підключення до сервера.',statsTitle:'📊 Статистика',settingsTitle:'⚙ Налаштування',language:'Мова',waterSettings:'Ціль води',localStorageNote:'Записи зберігаються на цьому пристрої у браузері/застосунку.',navHome:'Головна',navWater:'Вода',navFood:'Їжа',navSport:'Спорт',navSleep:'Сон',navHobbies:'Хобі',navAI:'AI',empty:'Записів поки немає.',waterSummary:'Вода',records:'Записів',days:'Днів із даними',totalEntries:'Усього записів',goalPrompt:'Денна ціль води у мл',fillMain:'Заповни основне поле.',editAmount:'Змінити кількість',cancel:'Скасувати',modalAmountTitle:'Змінити кількість води',modalGoalTitle:'Змінити денну ціль',modalAmountDesc:'Вкажи, скільки води ти вже випив сьогодні.',modalGoalDesc:'Вкажи свою денну ціль води.',amountLabel:'Випито сьогодні (мл)',goalLabel:'Денна ціль (мл)',saved:'Збережено'},
+ru:{welcome:'ДОБРО ПОЖАЛОВАТЬ',toSaymon:'В SAYMON',tagline:'ТВОЯ ЖИЗНЬ. ТВОИ ПРАВИЛА.',homeWaterBtn:'Записать воду',overviewTitle:'Сегодня вкратце',statsBtn:'Статистика',waterTitle:'💧 Вода',todayWater:'Воды сегодня',dailyGoal:'Твоя дневная цель',changeGoal:'Изменить цель',foodTitle:'🍽 Еда',whatAte:'Что ты ел?',noteOptional:'Заметка (необязательно)',save:'Сохранить',entries:'Записи',sportHealthTitle:'🏋️ Спорт / Здоровье',training:'Тренировка',exercise:'Упражнение',repsNote:'Повторы / время / заметка',health:'Здоровье',howFeel:'Как ты себя чувствуешь?',extraInfo:'Дополнительная информация',sleepTitle:'🌙 Сон',hoursSlept:'Сколько часов ты спал?',hobbiesTitle:'🎯 Хобби',whatDid:'Чем занимался?',resultNote:'Результат / заметка',aiTitle:'✦ AI-помощник',aiPlaceholder:'Здесь будет твой AI-помощник. Для настоящего AI-чата нужно безопасное подключение к серверу.',statsTitle:'📊 Статистика',settingsTitle:'⚙ Настройки',language:'Язык',waterSettings:'Цель воды',localStorageNote:'Записи хранятся на этом устройстве в браузере/приложении.',navHome:'Главная',navWater:'Вода',navFood:'Еда',navSport:'Спорт',navSleep:'Сон',navHobbies:'Хобби',navAI:'AI',empty:'Записей пока нет.',waterSummary:'Вода',records:'Записей',days:'Дней с данными',totalEntries:'Всего записей',goalPrompt:'Дневная цель воды в мл',fillMain:'Заполни основное поле.',editAmount:'Изменить количество',cancel:'Отмена',modalAmountTitle:'Изменить количество воды',modalGoalTitle:'Изменить дневную цель',modalAmountDesc:'Укажи, сколько воды ты уже выпил сегодня.',modalGoalDesc:'Укажи свою дневную цель воды.',amountLabel:'Выпито сегодня (мл)',goalLabel:'Дневная цель (мл)',saved:'Сохранено'}
 };
 const day=()=>new Date().toISOString().slice(0,10);
 let data={};try{data=JSON.parse(localStorage.getItem('saymon_data')||'{}')||{}}catch(e){data={}}
@@ -183,8 +203,27 @@ let lang=localStorage.getItem('saymon_lang')||'en';
 function tr(k){return (translations[lang]||translations.en)[k]||translations.en[k]||k}
 function persist(){localStorage.setItem('saymon_data',JSON.stringify(data));render()}
 function today(){if(!data[day()])data[day()]={water:0,items:[]};if(!Array.isArray(data[day()].items))data[day()].items=[];return data[day()]}
-function addWater(n){today().water+=n;persist()}
-function changeGoal(){let v=prompt(tr('goalPrompt'),data.goal||3000);if(v&&Number(v)>0){data.goal=Number(v);persist()}}
+function addWater(n){today().water=(today().water||0)+n;persist()}
+function removeWater(n){today().water=Math.max(0,(today().water||0)-n);persist()}
+let modalMode='amount';
+function openModal(mode){
+ modalMode=mode;
+ const t=today(),input=document.getElementById('modalNumber');
+ document.getElementById('modalTitle').textContent=tr(mode==='goal'?'modalGoalTitle':'modalAmountTitle');
+ document.getElementById('modalDescription').textContent=tr(mode==='goal'?'modalGoalDesc':'modalAmountDesc');
+ document.getElementById('modalFieldLabel').textContent=tr(mode==='goal'?'goalLabel':'amountLabel');
+ input.value=mode==='goal'?(data.goal||3000):(t.water||0);
+ document.getElementById('editModal').classList.add('open');
+ setTimeout(()=>{input.focus();input.select()},80);
+}
+function closeModal(){document.getElementById('editModal').classList.remove('open')}
+function saveModalValue(){
+ const input=document.getElementById('modalNumber'),value=Number(input.value);
+ if(input.value.trim()===''||!Number.isFinite(value)||value<0){input.focus();return}
+ if(modalMode==='goal'){if(value===0){input.focus();return}data.goal=Math.round(value)}
+ else today().water=Math.round(value);
+ closeModal();persist();
+}
 function setLanguage(value){lang=value;localStorage.setItem('saymon_lang',lang);applyLanguage();render()}
 function applyLanguage(){
  document.documentElement.lang=lang;
@@ -195,25 +234,4 @@ function applyLanguage(){
 function showPage(id){document.querySelectorAll('main section').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('active',b.dataset.page===id));render();window.scrollTo(0,0)}
 function saveEntry(type,a,b){const x=document.getElementById(a),y=document.getElementById(b);if(!x.value.trim())return alert(tr('fillMain'));today().items.push({type,a:x.value,b:y.value,time:new Date().toLocaleTimeString()});x.value='';y.value='';persist()}
 function esc(s){return String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
-function list(id,type){const el=document.getElementById(id);if(!el)return;const aliases={food:['food','Питание'],sport:['sport','Тренировка'],health:['health','Здоровье'],sleep:['sleep','Сон'],hobbies:['hobbies','Хобби']};const items=today().items.filter(x=>(aliases[type]||[type]).includes(x.type)).slice().reverse();el.innerHTML=items.length?items.map(x=>`<div class="entry"><b>${esc(x.a)}</b><div class="muted">${esc(x.b||'')} · ${esc(x.time||'')}</div></div>`).join(''):`<span class="muted">${tr('empty')}</span>`}
-function render(){
- const t=today(),g=data.goal||3000;
- document.getElementById('waterValue').textContent=t.water||0;
- document.getElementById('goalValue').textContent=g;
- document.getElementById('settingsGoal').textContent=g;
- document.getElementById('waterProgress').style.width=Math.min(100,(t.water||0)/g*100)+'%';
- const total=t.items.length;
- document.getElementById('homeSummary').textContent=tr('waterSummary')+': '+(t.water||0)+' ml  •  '+tr('records')+': '+total;
- document.getElementById('overviewStats').innerHTML=`<span class="stat">${tr('waterSummary')}: ${t.water||0} ml</span><span class="stat">${tr('records')}: ${total}</span>`;
- list('foodList','food');list('sportList','sport');list('healthList','health');list('sleepList','sleep');list('hobbiesList','hobbies');
- const all=Object.values(data).filter(v=>v&&Array.isArray(v.items));
- document.getElementById('statsContent').innerHTML=`<span class="stat">${tr('days')}: ${all.length}</span><span class="stat">${tr('totalEntries')}: ${all.reduce((n,v)=>n+v.items.length,0)}</span><span class="stat">${tr('waterSummary')}: ${t.water||0} ml</span>`;
-}
-applyLanguage();render();
-</script>
-<script>
-if("serviceWorker" in navigator){window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js").catch(()=>{}));}
-</script>
-</body>
-                                                               </html>
-                                                               
+function list(id,type){const el=document.getElementById(id);if(!el)return;const aliases={food:['food','Питание'],sport:['sport','Тренировка'],health:['health','Здоровье'],sleep:['sleep','Сон'],hobbies:['hobbies',
